@@ -3,8 +3,6 @@ langchain
 langchain-core
 langgraph
 python-dotenv
-msal
-requests
 jira
 pydantic
 fastapi
@@ -12,4 +10,6 @@ uvicorn
 python-dateutil
 markdownify
 html2text
+msgraph-sdk
+azure-identity
 
