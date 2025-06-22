@@ -1,0 +1,8 @@
+venv/
+.env
+PRD.txt
+__pycache__/
+*egg-info/
+logs/
+output/
+.vscode/
