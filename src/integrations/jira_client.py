@@ -2,16 +2,9 @@ import os
 from dotenv import load_dotenv
 from jira import JIRA
 from datetime import datetime, timedelta
+from src.helpers.mock_data import MockJiraData
 
 load_dotenv()
-
-try:
-    from src.helpers.mock_data import MockJiraData
-except ImportError:
-    class MockJiraData:
-        @staticmethod
-        def get_mock_issues():
-            return []
 
 class JiraClient:
     def __init__(self, use_mock_data=False):
@@ -32,6 +25,7 @@ class JiraClient:
             self.client = None
         else:
             self.client = self._authenticate()
+            
     def _authenticate(self):
         """Authenticate with JIRA."""
         try:
@@ -59,6 +53,8 @@ class JiraClient:
         except Exception as e:
             print(f"Error fetching JIRA issues: {str(e)}. Using mock data instead.")
             return MockJiraData.get_mock_issues()
+        
+
     def get_created_issues(self, days_back=7):
         """Get issues created by the user."""
         if self.use_mock_data:
