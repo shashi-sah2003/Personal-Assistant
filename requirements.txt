@@ -14,4 +14,6 @@ msgraph-sdk
 azure-identity
 schedule
 langchain-google-genai
+langchain_community
+atlassian-python-api
 
