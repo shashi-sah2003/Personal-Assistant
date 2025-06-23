@@ -13,4 +13,5 @@ html2text
 msgraph-sdk
 azure-identity
 schedule
+langchain-google-genai
 

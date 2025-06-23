@@ -5,10 +5,32 @@ import schedule
 import time
 from datetime import datetime
 from pathlib import Path
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from src.agents.workflow import run_personal_assistant
+from src.api.jira_endpoints import router as jira_router
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.agents.workflow import run_personal_assistant
+
+app = FastAPI(
+    title="GEP Personal Assistant API",
+    description="API for interacting with various workplace services including JIRA, Email, Calendar, and Teams.",
+    version="1.0.0"
+)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(jira_router)
+
 
 def generate_daily_summary(use_mock_data=False):
     """Generate the daily summary and save it to a file
@@ -151,3 +173,5 @@ if __name__ == "__main__":
         print("Please specify either --run-once or --schedule")
         print("="*80 + "\n")
         parser.print_help()
+
+
