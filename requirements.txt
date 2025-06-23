@@ -12,4 +12,5 @@ markdownify
 html2text
 msgraph-sdk
 azure-identity
+schedule
 
