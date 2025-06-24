@@ -44,7 +44,6 @@ class GoogleClient:
                 userId='me', id=msg['id'], format='full'
             ).execute()
             headers = {h['name']: h['value'] for h in msg_detail['payload']['headers']}
-            # Extract plain text body if available
             body = ""
             payload = msg_detail.get('payload', {})
             if 'parts' in payload:

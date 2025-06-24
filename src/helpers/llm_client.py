@@ -84,7 +84,7 @@ class GeminiClient:
             f"Date: {email.get('date', 'Unknown')}\n"
             f"Snippet: {email.get('snippet', '')}\n"
             f"Body: {email.get('body', 'No body available')}\n"
-            for email in emails 
+            for email in emails if email
         ])
         
         return self.analyze_text(emails_text, prompt)
@@ -114,11 +114,11 @@ class GeminiClient:
         ## Meeting Schedule
         
         ### Today
-        - [Time] [Meeting Title] - [Location/Teams/Zoom]
+        - [Time] [Meeting Title] - [Location/Slack/Zoom]
           Brief description, attendees, preparation needed
         
         ### Tomorrow
-        - [Time] [Meeting Title] - [Location/Teams/Zoom]
+        - [Time] [Meeting Title] - [Location/Slack/Zoom]
           Brief description, attendees, preparation needed
         
         ## Preparation Required
@@ -136,7 +136,7 @@ class GeminiClient:
             f"Attendees: {', '.join(event.get('attendees', []))}\n"
             f"Description: {event.get('description', '')}\n"
             f"Status: {event.get('status', 'Unknown')}\n"
-            for event in events
+            for event in events if event
         ])
         
         return self.analyze_text(events_text, prompt)
@@ -195,29 +195,29 @@ class GeminiClient:
         return self.analyze_text(issues_text, prompt)
 
 
-    @observe(name="teams_summary")
-    def summarize_teams_messages(self, messages):
+    @observe(name="slack_summary")
+    def summarize_Slack_messages(self, messages):
         """
-        Summarize Teams messages
+        Summarize Slack messages
         
         Args:
-            messages (list): List of Teams message details
+            messages (list): List of Slack message details
         
         Returns:
-            str: Summary of Teams messages
+            str: Summary of Slack messages
         """
         prompt = """
-        Analyze the following Microsoft Teams messages and provide:
+        Analyze the following Microsoft Slack messages and provide:
         1. A summary of important conversations
         2. Any action items or requests directed at the user
         3. Unanswered questions or pending replies
         
-        Teams Messages:
+        Slack Messages:
         {text}
         
         Format your response as:
         
-        ## Teams Messages Summary
+        ## Slack Messages Summary
         
         ### Important Conversations
         - [Chat Name/Person] - Brief summary of important discussion
@@ -231,17 +231,17 @@ class GeminiClient:
         """
         
         messages_text = "\n\n".join([
-            f"From: {message.get('from', {}).get('user', {}).get('displayName', 'Unknown')}\n"
-            f"Chat: {message.get('chatId', 'Unknown')}\n"
-            f"Time: {message.get('createdDateTime', 'Unknown')}\n"
-            f"Content: {message.get('body', {}).get('content', 'No content')}\n"
-            for message in messages.get('value', [])
+            f"Channel: {msg.get('channel', 'Unknown')}\n"
+            f"User: {msg.get('user', 'Unknown')}\n"
+            f"Time: {msg.get('time', 'Unknown')}\n"
+            f"Message: {msg.get('text', '')}"
+            for msg in messages if msg
         ])
         
         return self.analyze_text(messages_text, prompt)
 
     @observe(name="daily_summary")
-    def create_daily_summary(self, email_summary, meetings_summary, jira_summary, teams_summary):
+    def create_daily_summary(self, email_summary, meetings_summary, jira_summary, slack_summary):
         """
         Create a comprehensive daily summary from all sources
         
@@ -249,7 +249,7 @@ class GeminiClient:
             email_summary (str): Summary of emails
             meetings_summary (str): Summary of calendar events
             jira_summary (str): Summary of JIRA tickets
-            teams_summary (str): Summary of Teams messages
+            slack_summary (str): Summary of Slack messages
         
         Returns:
             str: Comprehensive daily summary with action items
@@ -266,8 +266,8 @@ class GeminiClient:
         ## JIRA Tickets:
         {jira_summary}
         
-        ## Teams Messages:
-        {teams_summary}
+        ## Slack Messages:
+        {slack_summary}
         
         Please create a well-organized daily briefing with:
         1. An executive summary of the most important items across all platforms
@@ -284,6 +284,6 @@ class GeminiClient:
                 email_summary=email_summary,
                 meetings_summary=meetings_summary,
                 jira_summary=jira_summary,
-                teams_summary=teams_summary
+                slack_summary=slack_summary
             )
         )
