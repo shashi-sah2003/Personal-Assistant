@@ -5,11 +5,10 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from src.integrations.jira_client import JiraClient
 from src.helpers.llm_client import GeminiClient
-from langchain_core.messages import HumanMessage
 
 class JiraAgent:
-    def __init__(self, use_mock_data=False):
-        self.jira_client = JiraClient(use_mock_data=use_mock_data)
+    def __init__(self):
+        self.jira_client = JiraClient()
         self.llm_client = GeminiClient()
         
     def run(self, days_back=7):
