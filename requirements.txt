@@ -16,4 +16,5 @@ schedule
 langchain-google-genai
 langchain_community
 atlassian-python-api
-
+google-genai
+langfuse

@@ -1,8 +1,10 @@
 import os
 import google.generativeai as genai
 from dotenv import load_dotenv
+from langfuse import observe
 
 load_dotenv()
+
 
 class GeminiClient:
     def __init__(self):
@@ -36,6 +38,7 @@ class GeminiClient:
             print(f"Error in analyzing text: {str(e)}")
             return f"Error analyzing text: {str(e)}"
     
+    @observe(name="email_summary")
     def summarize_emails(self, emails):
         """
         Summarize emails
@@ -84,7 +87,8 @@ class GeminiClient:
         ])
         
         return self.analyze_text(emails_text, prompt)
-    
+
+    @observe(name="meeting_summary")
     def summarize_meetings(self, events):
         """
         Summarize calendar events
@@ -133,7 +137,8 @@ class GeminiClient:
         ])
         
         return self.analyze_text(events_text, prompt)
-    
+
+    @observe(name="jira_summary")
     def summarize_jira_tickets(self, jira_issues):
         """
         Summarize JIRA tickets
@@ -185,7 +190,9 @@ class GeminiClient:
             issues_text += f"Description: {issue.fields.description if issue.fields.description else 'No description'}\n\n"
         
         return self.analyze_text(issues_text, prompt)
-    
+
+
+    @observe(name="teams_summary")
     def summarize_teams_messages(self, messages):
         """
         Summarize Teams messages
@@ -229,7 +236,8 @@ class GeminiClient:
         ])
         
         return self.analyze_text(messages_text, prompt)
-    
+
+    @observe(name="daily_summary")
     def create_daily_summary(self, email_summary, meetings_summary, jira_summary, teams_summary):
         """
         Create a comprehensive daily summary from all sources
