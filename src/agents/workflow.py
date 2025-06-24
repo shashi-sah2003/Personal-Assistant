@@ -4,7 +4,7 @@ from typing import Dict, Any, TypedDict, Optional
 from langgraph.graph import StateGraph, END, START
 from src.agents.email_agent.agent import EmailAgent
 from src.agents.calendar_agent.agent import CalendarAgent
-from src.agents.teams_agent.agent import TeamsAgent
+from src.agents.slack_agent.agent import TeamsAgent
 from src.agents.jira_agent.agent import JiraAgent
 from src.helpers.llm_client import GeminiClient
 
