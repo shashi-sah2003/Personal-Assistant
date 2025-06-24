@@ -10,13 +10,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.agents.workflow import run_personal_assistant
 from src.api.jira_endpoints import router as jira_router
 from fastapi.responses import JSONResponse
+import traceback
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 app = FastAPI(
     title="GEP Personal Assistant API",
-    description="API for interacting with various workplace services including JIRA, Email, Calendar, and Teams.",
+    description="API for interacting with various workplace services including JIRA, Email, Calendar, and Slack.",
     version="1.0.0"
 )
 
@@ -32,17 +33,13 @@ app.add_middleware(
 app.include_router(jira_router)
 
 
-def generate_daily_summary(use_mock_data=False):
+def generate_daily_summary():
     """Generate the daily summary and save it to a file
-    
-    Args:
-        use_mock_data (bool): Whether to use mock data instead of real API calls
     """
     print(f"Generating daily summary at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"{'Using mock data' if use_mock_data else 'Using real API data'}")
     
     try:
-        result = run_personal_assistant(use_mock_data=use_mock_data)
+        result = run_personal_assistant()
         
         output_dir = Path("output")
         output_dir.mkdir(exist_ok=True)
@@ -72,8 +69,8 @@ def generate_daily_summary(use_mock_data=False):
 
             ---
 
-            ## Teams Messages
-            {result['teams_summary']}
+            ## Slack Messages
+            {result['slack_summary']}
 
             ---
 
@@ -101,6 +98,7 @@ def generate_daily_summary(use_mock_data=False):
     except Exception as e:
         error_message = f"Error generating daily summary: {str(e)}"
         print(error_message)
+        traceback.print_exc()
         
         output_dir = Path("output")
         output_dir.mkdir(exist_ok=True)
@@ -113,27 +111,23 @@ def generate_daily_summary(use_mock_data=False):
             
         return error_message
 
-def schedule_daily_summary(hour=8, minute=30, use_mock_data=False):
+def schedule_daily_summary(hour=8, minute=30):
     """Schedule the daily summary to run at a specific time
     
     Args:
         hour (int): Hour to run (24-hour format)
         minute (int): Minute to run
-        use_mock_data (bool): Whether to use mock data instead of real API calls
     """
-    schedule.every().day.at(f"{hour:02d}:{minute:02d}").do(lambda: generate_daily_summary(use_mock_data))
+    schedule.every().day.at(f"{hour:02d}:{minute:02d}").do(lambda: generate_daily_summary())
     print(f"Daily summary scheduled to run at {hour:02d}:{minute:02d} every day")
-    print(f"{'Using mock data' if use_mock_data else 'Using real API data'}")
 
 @app.get("/run_daily_summary")
-async def run_once(use_mock_data=False):
+async def run_once():
     """Run the daily summary once
     
-    Args:
-        use_mock_data (bool): Whether to use mock data instead of real API calls
     """
     # return generate_daily_summary(use_mock_data=use_mock_data)
-    result = generate_daily_summary(use_mock_data=use_mock_data)
+    result = generate_daily_summary()
     if isinstance(result, dict):
         return JSONResponse(content=result)
     else:
@@ -151,8 +145,6 @@ if __name__ == "__main__":
                         help="Minute to run the scheduled summary")
     parser.add_argument("--run-once", action="store_true",
                         help="Run the daily summary once and exit")
-    parser.add_argument("--mock", action="store_true",
-                        help="Use mock data instead of real API calls")
     args = parser.parse_args()
     
     if args.run_once:
@@ -160,7 +152,7 @@ if __name__ == "__main__":
         print(f"Starting Personal Assistant - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print("="*80 + "\n")
         
-        summary = run_once(use_mock_data=args.mock)
+        summary = run_once()
         
         print("\n" + "="*80 + "\n")
         print(summary)
@@ -168,7 +160,7 @@ if __name__ == "__main__":
         print("Personal Assistant completed successfully!")
         print("="*80 + "\n")
     elif args.schedule:
-        schedule_daily_summary(args.hour, args.minute, use_mock_data=args.mock)
+        schedule_daily_summary(args.hour, args.minute)
         
         print(f"\n{'='*80}")
         print(f"Personal Assistant Scheduler started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
