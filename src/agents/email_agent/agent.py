@@ -1,17 +1,17 @@
 import sys
 import os
-from src.integrations.ms_graph_client import MSGraphClient
+from src.integrations.google_client import GoogleClient
 from src.helpers.llm_client import GeminiClient
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 
 class EmailAgent:
-    def __init__(self, use_mock_data=False):
-        self.ms_graph_client = MSGraphClient(use_mock_data=use_mock_data)
+    def __init__(self):
+        self.google_client = GoogleClient()
         self.llm_client = GeminiClient()
         
-    def run(self, top=10, days=1):
+    def run(self, max_results=20):
         """
         Run email agent to collect and analyze email data
         
@@ -23,19 +23,18 @@ class EmailAgent:
             dict: Email data and summary
         """
         try:
-            print("📧 Email Agent: Retrieving recent emails...")
+            print("📧 Email Agent: Retrieving recent emails from Gmail...")
             
-            filter_criteria = f"receivedDateTime ge {self._get_date_filter(days)}"
-            emails = self.ms_graph_client.get_emails(top=top, filter_criteria=filter_criteria)
+            emails = self.google_client.get_todays_emails(max_results=max_results)
             
-            if not emails or 'value' not in emails or len(emails['value']) == 0:
+            if not emails:
                 return {"summary": "No recent emails found.", "emails": []}
                 
             summary = self.llm_client.summarize_emails(emails)
             
             return {
                 "summary": summary,
-                "emails": emails['value']
+                "emails": emails
             }
         
         except Exception as e:

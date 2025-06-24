@@ -81,9 +81,10 @@ class GeminiClient:
         emails_text = "\n\n".join([
             f"From: {email.get('from', 'Unknown')}\n"
             f"Subject: {email.get('subject', 'No Subject')}\n"
-            f"Date: {email.get('receivedDateTime', 'Unknown')}\n"
-            f"Body: {email.get('bodyPreview', 'No preview available')}\n"
-            for email in emails.get('value', [])
+            f"Date: {email.get('date', 'Unknown')}\n"
+            f"Snippet: {email.get('snippet', '')}\n"
+            f"Body: {email.get('body', 'No body available')}\n"
+            for email in emails 
         ])
         
         return self.analyze_text(emails_text, prompt)
@@ -126,14 +127,16 @@ class GeminiClient:
         """
         
         events_text = "\n\n".join([
-            f"Subject: {event.get('subject', 'No Subject')}\n"
-            f"Start: {event.get('start', {}).get('dateTime', 'Unknown')}\n"
-            f"End: {event.get('end', {}).get('dateTime', 'Unknown')}\n"
-            f"Location: {event.get('location', {}).get('displayName', 'No location')}\n"
-            f"Organizer: {event.get('organizer', {}).get('emailAddress', {}).get('name', 'Unknown')}\n"
-            f"Attendees: {', '.join([a.get('emailAddress', {}).get('name', 'Unknown') for a in event.get('attendees', [])])}\n"
-            f"Body: {event.get('bodyPreview', 'No preview available')}\n"
-            for event in events.get('value', [])
+            f"Title: {event.get('summary', 'No Title')}\n"
+            f"Start: {event.get('start', 'Unknown')}\n"
+            f"End: {event.get('end', 'Unknown')}\n"
+            f"Location: {event.get('location', 'No location')}\n"
+            f"Hangout Link: {event.get('hangoutLink', '')}\n"
+            f"Organizer: {event.get('organizer', 'Unknown')}\n"
+            f"Attendees: {', '.join(event.get('attendees', []))}\n"
+            f"Description: {event.get('description', '')}\n"
+            f"Status: {event.get('status', 'Unknown')}\n"
+            for event in events
         ])
         
         return self.analyze_text(events_text, prompt)
