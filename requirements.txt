@@ -24,3 +24,4 @@ google-auth-httplib2
 google-auth-oauthlib
 langchain-google-community[gmail]
 langchain-google-community[calendar]
+langchain-openai
