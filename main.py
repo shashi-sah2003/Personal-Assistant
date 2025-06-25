@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.agents.workflow import run_personal_assistant
 from src.api.jira_endpoints import router as jira_router
 from src.api.gmail_endpoints import router as gmail_router
+from src.api.calendar_endpoints import router as calendar_router
 from fastapi.responses import JSONResponse
 import traceback
 
@@ -33,6 +34,7 @@ app.add_middleware(
 
 app.include_router(jira_router)
 app.include_router(gmail_router)
+app.include_router(calendar_router)
 
 
 def generate_daily_summary():
@@ -84,10 +86,6 @@ def generate_daily_summary():
             
         print(f"Daily summary saved to {output_file}")
         
-        # with open(output_dir / f"daily_summary_{timestamp}.json", "w", encoding="utf-8") as f:
-        #     json.dump(result, f, indent=4)
-            
-        # return summary
         json_file = output_dir / f"daily_summary_{timestamp}.json"
         with open(json_file, "w", encoding="utf-8") as f:
             json.dump(result, f, indent=4)
@@ -128,7 +126,6 @@ async def run_once():
     """Run the daily summary once
     
     """
-    # return generate_daily_summary(use_mock_data=use_mock_data)
     result = generate_daily_summary()
     if isinstance(result, dict):
         return JSONResponse(content=result)
