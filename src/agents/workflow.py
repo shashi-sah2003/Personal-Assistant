@@ -16,7 +16,7 @@ class AgentState(TypedDict):
     calendar_data: Optional[Dict]
     slack_data: Optional[Dict]
     jira_data: Optional[Dict]
-    final_summary: Optional[str]
+    todo_list: Optional[str]
     error: Optional[str]
 
 def create_personal_assistant_workflow():
@@ -63,24 +63,43 @@ def create_personal_assistant_workflow():
             return {"jira_error": f"Error in JIRA agent: {str(e)}"}
     
     # Summary Agent Node
+    # def summary_agent(state: AgentState) -> AgentState:
+    #     try:
+    #         llm_client = GeminiClient()
+            
+    #         email_summary = state.get("email_data", {}).get("summary", "No email data available.")
+    #         calendar_summary = state.get("calendar_data", {}).get("summary", "No calendar data available.")
+    #         jira_summary = state.get("jira_data", {}).get("summary", "No JIRA data available.")
+    #         slack_summary = state.get("slack_data", {}).get("summary", "No Slack data available.")
+            
+    #         # Create a comprehensive daily summary
+    #         final_summary = llm_client.create_daily_summary(
+    #             email_summary=email_summary,
+    #             meetings_summary=calendar_summary,
+    #             jira_summary=jira_summary,
+    #             slack_summary=slack_summary
+    #         )
+            
+    #         return {"final_summary": final_summary}
+    #     except Exception as e:
+    #         return {"error": f"Error in summary agent: {str(e)}"}
+
     def summary_agent(state: AgentState) -> AgentState:
         try:
             llm_client = GeminiClient()
-            
             email_summary = state.get("email_data", {}).get("summary", "No email data available.")
             calendar_summary = state.get("calendar_data", {}).get("summary", "No calendar data available.")
             jira_summary = state.get("jira_data", {}).get("summary", "No JIRA data available.")
             slack_summary = state.get("slack_data", {}).get("summary", "No Slack data available.")
-            
-            # Create a comprehensive daily summary
-            final_summary = llm_client.create_daily_summary(
+
+            # Use the new todo list method
+            todo_list = llm_client.create_todo_list(
                 email_summary=email_summary,
                 meetings_summary=calendar_summary,
                 jira_summary=jira_summary,
                 slack_summary=slack_summary
             )
-            
-            return {"final_summary": final_summary}
+            return {"todo_list": todo_list}
         except Exception as e:
             return {"error": f"Error in summary agent: {str(e)}"}
     
@@ -116,7 +135,7 @@ def run_personal_assistant() -> Dict[str, Any]:
         "calendar_data": None,
         "slack_data": None,
         "jira_data": None,
-        "final_summary": None,
+        "todo_list": None,
         "error": None,
     }
     
@@ -129,6 +148,6 @@ def run_personal_assistant() -> Dict[str, Any]:
         "calendar_summary": result.get("calendar_data", {}).get("summary", "No calendar data available."),
         "jira_summary": result.get("jira_data", {}).get("summary", "No JIRA data available."),
         "slack_summary": result.get("slack_data", {}).get("summary", "No Slack data available."),
-        "final_summary": result.get("final_summary", "No summary available."),
+        "todo_list": result.get("todo_list", []),
         "error": result.get("error")
     }

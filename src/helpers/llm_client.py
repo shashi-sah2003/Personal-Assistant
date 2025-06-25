@@ -2,6 +2,10 @@ import os
 import google.generativeai as genai
 from dotenv import load_dotenv
 from langfuse import observe
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import PromptTemplate
+from src.helpers.todo_schema import TodoList
+from langchain_core.runnables import RunnableLambda
 
 load_dotenv()
 
@@ -37,6 +41,42 @@ class GeminiClient:
         except Exception as e:
             print(f"Error in analyzing text: {str(e)}")
             return f"Error analyzing text: {str(e)}"
+    
+    def create_todo_list(self, email_summary, meetings_summary, jira_summary, slack_summary):
+        """
+        Create a todo list from all sources.
+        """
+        parser = JsonOutputParser(pydantic_object=TodoList)
+        prompt = PromptTemplate(
+            template=(
+                "Based on the following summaries, extract a todo list. "
+                "{format_instructions}\n"
+                "## Email Summary:\n{email_summary}\n"
+                "## Meeting Schedule:\n{meetings_summary}\n"
+                "## JIRA Tickets:\n{jira_summary}\n"
+                "## Slack Messages:\n{slack_summary}\n"
+            ),
+            input_variables=["email_summary", "meetings_summary", "jira_summary", "slack_summary"],
+            partial_variables={"format_instructions": parser.get_format_instructions()},
+        )
+
+        def gemini_invoke(prompt_dict):
+            if isinstance(prompt_dict, dict):
+                prompt_str = prompt_dict.get("input", "")
+                if not prompt_str:
+                    prompt_str = next(iter(prompt_dict.values()), "")
+            else:
+                prompt_str = str(prompt_dict)
+            response = self.model.generate_content(prompt_str)
+            return response.text if hasattr(response, "text") else str(response)
+    
+        chain = prompt | RunnableLambda(gemini_invoke) | parser
+        return chain.invoke({
+            "email_summary": email_summary,
+            "meetings_summary": meetings_summary,
+            "jira_summary": jira_summary,
+            "slack_summary": slack_summary,
+        })
     
     @observe(name="email_summary")
     def summarize_emails(self, emails):
