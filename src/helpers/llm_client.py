@@ -196,7 +196,7 @@ class GeminiClient:
 
 
     @observe(name="slack_summary")
-    def summarize_Slack_messages(self, messages):
+    def summarize_slack_messages(self, messages):
         """
         Summarize Slack messages
         

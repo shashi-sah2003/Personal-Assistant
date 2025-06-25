@@ -31,7 +31,7 @@ class SlackAgent:
             if not messages or len(messages) == 0:
                 return {"summary": "No recent Slack messages found.", "messages": []}
             
-            summary = self.llm_client.summarize_Slack_messages(messages)
+            summary = self.llm_client.summarize_slack_messages(messages)
             
             return {
                 "summary": summary,
