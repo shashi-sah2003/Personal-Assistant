@@ -78,8 +78,13 @@ def run_calendar_agent(query: str, thread_id: str = "default", model_name: str =
 @router.post("/query", response_model=CalendarResponse)
 async def query_calendar(calendar_query: CalendarQuery = Body(...)):
     try:
+        # Always instruct the agent to use the primary calendar
+        user_query = calendar_query.query.strip()
+        prefix = "You must fetch from the primary calendar only. "
+        if not user_query.lower().startswith("you must fetch from the primary calendar only"):
+            user_query = prefix + user_query
         response = run_calendar_agent(
-            calendar_query.query,
+            user_query,
             calendar_query.thread_id,
             calendar_query.model
         )
