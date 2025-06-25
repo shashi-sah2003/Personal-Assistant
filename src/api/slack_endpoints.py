@@ -45,7 +45,6 @@ def get_agent_executor():
         checkpointer=memory
     )
 
-# Singleton agent executor
 agent_executor = get_agent_executor()
 
 @observe(name="slack_agent_query")
