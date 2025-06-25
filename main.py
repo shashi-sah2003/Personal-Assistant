@@ -11,6 +11,7 @@ from src.agents.workflow import run_personal_assistant
 from src.api.jira_endpoints import router as jira_router
 from src.api.gmail_endpoints import router as gmail_router
 from src.api.calendar_endpoints import router as calendar_router
+from src.api.slack_endpoints import router as slack_router
 from fastapi.responses import JSONResponse
 import traceback
 
@@ -35,6 +36,7 @@ app.add_middleware(
 app.include_router(jira_router)
 app.include_router(gmail_router)
 app.include_router(calendar_router)
+app.include_router(slack_router)
 
 
 def generate_daily_summary():
