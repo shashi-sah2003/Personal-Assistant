@@ -9,6 +9,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
 from dotenv import load_dotenv
+from langfuse import observe 
 
 load_dotenv()
 
@@ -61,6 +62,7 @@ def get_or_create_agent(model_name):
         _agent_executors[model_name] = get_agent_executor(model_name)
     return _agent_executors[model_name]
 
+@observe(name="jira_agent_query")
 def run_jira_agent(query: str, thread_id: str = "default", model_name: str = DEFAULT_MODEL_NAME):
     """
     Run the JIRA agent with a given query
