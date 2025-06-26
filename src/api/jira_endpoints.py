@@ -18,6 +18,7 @@ DEFAULT_MODEL_NAME = "gemini-1.5-flash"
 class JiraQuery(BaseModel):
     query: str
     thread_id: Optional[str] = "default"
+    model: Optional[str] = DEFAULT_MODEL_NAME
 
 class JiraResponse(BaseModel):
     response: str
