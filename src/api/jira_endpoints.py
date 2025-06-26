@@ -5,9 +5,9 @@ from pydantic import BaseModel
 from langchain_core.messages import HumanMessage
 from langchain_community.agent_toolkits.jira.toolkit import JiraToolkit
 from langchain_community.utilities.jira import JiraAPIWrapper
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
+from langchain_openai import AzureChatOpenAI
 from dotenv import load_dotenv
 from langfuse import observe 
 
@@ -18,7 +18,6 @@ DEFAULT_MODEL_NAME = "gemini-1.5-flash"
 class JiraQuery(BaseModel):
     query: str
     thread_id: Optional[str] = "default"
-    model: Optional[str] = DEFAULT_MODEL_NAME
 
 class JiraResponse(BaseModel):
     response: str
@@ -43,11 +42,14 @@ tools = toolkit.get_tools()
 
 def get_agent_executor(model_name=DEFAULT_MODEL_NAME):
     """Create an agent executor with specified model"""
-    llm = ChatGoogleGenerativeAI(
-        api_key=os.getenv("GEMINI_API_KEY"),
-        model=model_name,
-        temperature=0
+    llm = AzureChatOpenAI(
+        openai_api_key=os.environ["AZURE_OPENAI_API_KEY"],
+        azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
+        azure_deployment=os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"],
+        api_version=os.environ["AZURE_OPENAI_API_VERSION"],
+        temperature=0,
     )
+
     return create_react_agent(
         llm, 
         tools, 

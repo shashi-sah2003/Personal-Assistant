@@ -4,9 +4,9 @@ from typing import Optional
 from pydantic import BaseModel
 from langchain_core.messages import HumanMessage
 from langchain_google_community import GmailToolkit
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
+from langchain_openai import AzureChatOpenAI
 from dotenv import load_dotenv
 from langfuse import observe
 from langchain_google_community.gmail.utils import (
@@ -47,10 +47,12 @@ toolkit = GmailToolkit(api_resource=api_resource)
 tools = toolkit.get_tools()
 
 def get_agent_executor(model_name=DEFAULT_MODEL_NAME):
-    llm = ChatGoogleGenerativeAI(
-        api_key=os.getenv("GEMINI_API_KEY"),
-        model=model_name,
-        temperature=0
+    llm = AzureChatOpenAI(
+        openai_api_key=os.environ["AZURE_OPENAI_API_KEY"],
+        azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
+        azure_deployment=os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"],
+        api_version=os.environ["AZURE_OPENAI_API_VERSION"],
+        temperature=0,
     )
     return create_react_agent(
         llm,
