@@ -1,0 +1,1 @@
+# Slack Tool package initialization

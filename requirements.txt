@@ -10,7 +10,6 @@ uvicorn
 python-dateutil
 markdownify
 html2text
-msgraph-sdk
 azure-identity
 schedule
 langchain-google-genai
@@ -25,3 +24,4 @@ google-auth-oauthlib
 langchain-google-community[gmail]
 langchain-google-community[calendar]
 langchain-openai
+langgraph-checkpoint-sqlite

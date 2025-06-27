@@ -13,6 +13,7 @@ from src.api.gmail_endpoints import router as gmail_router
 from src.api.calendar_endpoints import router as calendar_router
 from src.api.slack_endpoints import router as slack_router
 from fastapi.responses import JSONResponse
+from src.api.unified_endpoints import router as unified_router
 import traceback
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -37,6 +38,7 @@ app.include_router(jira_router)
 app.include_router(gmail_router)
 app.include_router(calendar_router)
 app.include_router(slack_router)
+app.include_router(unified_router)
 
 
 def generate_daily_summary():
